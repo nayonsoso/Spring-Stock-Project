@@ -1,12 +1,20 @@
 package com.example.stockproject.controller;
 
+import com.example.stockproject.model.Company;
+import com.example.stockproject.service.CompanyService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 // xxxMapping 경로의 공통된 부분을 컨트롤러로 빼줄 수 있음
-@RestController()
+@RestController
 @RequestMapping("/company")
+@AllArgsConstructor
 public class CompanyController {
+
+    private final CompanyService companyService;
+
     @GetMapping("/autocomplete")
     public ResponseEntity<?> autocomplete(@RequestParam String keyword){
         return null;
@@ -18,8 +26,13 @@ public class CompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addCompany(){
-        return null;
+    public ResponseEntity<?> addCompany(@RequestBody Company request){
+        String ticker = request.getTicker().trim();
+        if(ObjectUtils.isEmpty(ticker)){
+            throw new RuntimeException("ticker is empty");
+        }
+        Company company = this.companyService.save(ticker);
+        return ResponseEntity.ok(company);
     }
 
     @DeleteMapping
