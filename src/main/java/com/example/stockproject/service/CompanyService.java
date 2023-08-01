@@ -9,8 +9,10 @@ import com.example.stockproject.persist.repository.DividendRepository;
 import com.example.stockproject.scraper.Scraper;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.collections4.Trie;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -21,7 +23,9 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CompanyService {
+    private final Trie trie;
     private final Scraper yahooFinanceScraper;
+
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
@@ -55,5 +59,23 @@ public class CompanyService {
 
     public Page<CompanyEntity> getAllCompany(Pageable pageable){
         return companyRepository.findAll(pageable);
+    }
+
+    public void addAutoCompleteKeyword(String keyword){
+        this.trie.put(keyword, null);
+        // 아파치에서 만든 trie는 노드에 키, 값을 저장할 수 있지만, 우리는 그런 기능 필요 없으므로 null
+    }
+
+    public List<String> autocomplete(String keyword){
+        return (List<String>) this.trie.prefixMap(keyword).keySet()
+                .stream().collect(Collectors.toList());
+    }
+
+    public List<String> getCompanyNameByKeyword(String keyword){
+        Pageable limit = PageRequest.of(0,10);
+        Page<CompanyEntity> companyEntities = this.companyRepository.findByNameStartingWithIgnoreCase(keyword, limit);
+        return companyEntities.stream()
+                                .map(e->e.getName())
+                                .collect(Collectors.toList());
     }
 }
