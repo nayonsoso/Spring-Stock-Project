@@ -9,6 +9,9 @@ import com.example.stockproject.persist.repository.DividendRepository;
 import com.example.stockproject.scraper.Scraper;
 
 import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -50,7 +53,7 @@ public class CompanyService {
         return company;
     }
 
-    public List<Company> getAllCompany(){
-        return companyRepository.findAll();
+    public Page<CompanyEntity> getAllCompany(Pageable pageable){
+        return companyRepository.findAll(pageable);
     }
 }

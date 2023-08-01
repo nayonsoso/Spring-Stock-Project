@@ -1,11 +1,16 @@
 package com.example.stockproject.controller;
 
 import com.example.stockproject.model.Company;
+import com.example.stockproject.persist.entity.CompanyEntity;
 import com.example.stockproject.service.CompanyService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 // xxxMapping 경로의 공통된 부분을 컨트롤러로 빼줄 수 있음
 @RestController
@@ -21,8 +26,9 @@ public class CompanyController {
     }
 
     @GetMapping
-    public ResponseEntity<?> searchCompany(){
-        return null;
+    public ResponseEntity<?> searchCompany(final Pageable pageable){
+        Page<CompanyEntity> companies = this.companyService.getAllCompany(pageable);
+        return ResponseEntity.ok(companies);
     }
 
     @PostMapping
