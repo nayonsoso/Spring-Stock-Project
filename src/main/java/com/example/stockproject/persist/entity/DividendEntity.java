@@ -5,16 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity(name="dividend")
+@Entity(name = "dividend")
 @Getter
 @ToString
 @NoArgsConstructor
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"companyId", "date"})})
 public class DividendEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +21,7 @@ public class DividendEntity {
     private LocalDateTime date;
     private String dividend;
 
-    public DividendEntity(Long companyId, Dividend dividend){
+    public DividendEntity(Long companyId, Dividend dividend) {
         this.companyId = companyId;
         this.dividend = dividend.getDividend();
         this.date = dividend.getDate();

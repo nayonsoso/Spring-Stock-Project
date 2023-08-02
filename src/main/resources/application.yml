@@ -19,3 +19,7 @@ spring:
     url: jdbc:h2:mem:test;
     Username: sa
     password:
+
+scheduler:
+  scrap:
+    yahoo: "0 0 0 * * *"
