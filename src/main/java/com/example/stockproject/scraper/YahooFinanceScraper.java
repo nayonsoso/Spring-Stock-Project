@@ -50,15 +50,11 @@ public class YahooFinanceScraper implements Scraper {
                 int year = Integer.valueOf(splits[2]);
                 String dividend = splits[3];
 
-
                 if (month < 0) {
                     throw new RuntimeException("Unexpected Month enum value -> " + month);
                 }
 
-                dividenList.add(Dividend.builder()
-                        .date(LocalDateTime.of(year, month, day, 0, 0))
-                        .dividend(dividend)
-                        .build());
+                dividenList.add( new Dividend(LocalDateTime.of(year, month, day, 0, 0), dividend));
             }
             scrapedResult.setDividendEntities(dividenList);
 
@@ -79,10 +75,7 @@ public class YahooFinanceScraper implements Scraper {
             // h1태그 중 첫번째것 중에 -으로 구분하여 두번째 것을 띄어쓰기 없이 가져옴
             Element titleEle = document.getElementsByTag("h1").get(0);
             String title = titleEle.text().split(" - ")[1].trim();
-            return Company.builder()
-                    .ticker(ticker)
-                    .name(title)
-                    .build();
+            return new Company(ticker, title);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -2,6 +2,7 @@ package com.example.stockproject.scheduler;
 
 import com.example.stockproject.model.Company;
 import com.example.stockproject.model.ScrapedResult;
+import com.example.stockproject.model.constants.CacheKey;
 import com.example.stockproject.persist.entity.CompanyEntity;
 import com.example.stockproject.persist.entity.DividendEntity;
 import com.example.stockproject.persist.repository.CompanyRepository;
@@ -10,6 +11,7 @@ import com.example.stockproject.scraper.Scraper;
 import com.example.stockproject.scraper.YahooFinanceScraper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +25,9 @@ public class ScraperScheduler {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
     private final YahooFinanceScraper scraper;
-
-    // 일정 주기마다 수행 - 매일 자정마다
-//    @Scheduled(cron = "${scheduler.scrap.yahoo}")
+   
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true) // finace 에 해당하는 캐시는 모두 비우겠다는 뜻
+    @Scheduled(cron = "${scheduler.scrap.yahoo}") // 일정 주기마다 수행 - 매일 자정마다
     public void yahooFinanceScheduling() {
 
         // 저장된 회사 목록을 조회
@@ -36,10 +38,7 @@ public class ScraperScheduler {
             log.info("scrapping scheduler is started -> " + company.getName());
 
             ScrapedResult scrapedResult = this.scraper.scrap(
-                    Company.builder()
-                            .ticker(company.getTicker())
-                            .name(company.getName())
-                            .build()
+                    new Company(company.getTicker(), company.getName())
             );
             // 스크래핑한 배당금 정보 중 DB 에 없는 값은 저장
             scrapedResult.getDividendEntities().stream()
