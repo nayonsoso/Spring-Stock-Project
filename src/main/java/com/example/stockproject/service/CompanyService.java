@@ -71,11 +71,31 @@ public class CompanyService {
                 .stream().collect(Collectors.toList());
     }
 
+    public void deleteAutoCompleteKeyword(String keyword){
+        this.trie.remove(keyword);
+    }
+
     public List<String> getCompanyNameByKeyword(String keyword){
         Pageable limit = PageRequest.of(0,10);
         Page<CompanyEntity> companyEntities = this.companyRepository.findByNameStartingWithIgnoreCase(keyword, limit);
         return companyEntities.stream()
                                 .map(e->e.getName())
                                 .collect(Collectors.toList());
+    }
+
+    public String deleteCompany(String ticker) {
+        // ticker에 해당하는 회사 조회
+        CompanyEntity companyEntity = this.companyRepository.findByTicker(ticker)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회사입니다."));
+
+        // 배당금 정보 삭제
+        this.dividendRepository.deleteAllByCompanyId(companyEntity.getId());
+
+        // 회사 삭제
+        this.companyRepository.delete(companyEntity);
+
+        this.deleteAutoCompleteKeyword(companyEntity.getName());
+
+        return companyEntity.getName();
     }
 }
