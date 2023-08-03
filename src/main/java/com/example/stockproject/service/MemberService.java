@@ -1,5 +1,6 @@
 package com.example.stockproject.service;
 
+import com.example.stockproject.exception.impl.AlreadyExistCompanyException;
 import com.example.stockproject.model.Auth;
 import com.example.stockproject.model.MemberEntity;
 import com.example.stockproject.persist.repository.MemberRepository;
@@ -29,7 +30,7 @@ public class MemberService implements UserDetailsService{
     public MemberEntity register(Auth.SignUp member){ // 회원가입
         boolean exists = this.memberRepository.existsByUsername(member.getUsername());
         if(exists){
-            throw new RuntimeException("이미 사용중인 아이디입니다.");
+            throw new AlreadyExistCompanyException();
         }
 
         // 사용자가 입력한 정보가 인코딩되어 저장됨

@@ -1,5 +1,6 @@
 package com.example.stockproject.service;
 
+import com.example.stockproject.exception.impl.NoCompanyException;
 import com.example.stockproject.model.Company;
 import com.example.stockproject.model.ScrapedResult;
 import com.example.stockproject.persist.entity.CompanyEntity;
@@ -86,7 +87,7 @@ public class CompanyService {
     public String deleteCompany(String ticker) {
         // ticker에 해당하는 회사 조회
         CompanyEntity companyEntity = this.companyRepository.findByTicker(ticker)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회사입니다."));
+                .orElseThrow(() -> new NoCompanyException());
 
         // 배당금 정보 삭제
         this.dividendRepository.deleteAllByCompanyId(companyEntity.getId());
